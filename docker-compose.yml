@@ -19,7 +19,7 @@ services:
       - DB-PASS=devpass
     depends_on:
       - db
-      
+
   db:
     image: postgres:13-alpine
     volumes:
@@ -31,3 +31,4 @@ services:
 
 volumes:
   dev-db-data:
+  
