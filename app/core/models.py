@@ -1,6 +1,9 @@
 '''
 Database models.
 '''
+from django.utils import timezone
+
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser,
@@ -42,3 +45,50 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
+
+class Event(models.Model):
+    '''Event model.'''
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    started_at = models.DateTimeField()
+    duration_hours = models.DecimalField(max_digits=5, decimal_places=2)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        '''Return string representation of the event.'''
+        return self.name
+
+
+class Ticket(models.Model):
+    '''Ticket model.'''
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    event = models.ForeignKey(
+        Event,
+        on_delete=models.CASCADE
+    )
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+    paid = models.BooleanField(default=False)
+    paid_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        '''Return string representation of the ticket.'''
+        return self.event.name
+
+    def pay(self):
+        '''Pay for the ticket.'''
+        self.paid = True
+        self.paid_at = timezone.now()
+        self.save()
