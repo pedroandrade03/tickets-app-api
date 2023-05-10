@@ -73,7 +73,7 @@ class Ticket(models.Model):
 
     event = models.ForeignKey(
         Event,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
