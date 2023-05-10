@@ -179,3 +179,51 @@ class PrivateTicketAPITests(TestCase):
             else:
                 self.assertEqual(value, getattr(ticket, key))
         self.assertEqual(ticket.owner, self.user)
+
+    def test_update_user_returns_error(self):
+        '''Test updating ticket with another user returns error.'''
+        other_user = create_user(email='other@examp.com', password='testpass')
+        ticket = create_ticket(
+            user=self.user,
+            event=create_event(user=self.user),
+            price=5.00,
+            paid=False
+        )
+
+        payload = {'owner': other_user.id}
+        url = detail_url(ticket.id)
+        self.client.patch(url, payload)
+
+        ticket.refresh_from_db()
+        self.assertEqual(ticket.owner, self.user)
+
+    def test_delete_ticket(self):
+        '''Test deleting a ticket.'''
+        ticket = create_ticket(
+            user=self.user,
+            event=create_event(user=self.user),
+            price=5.00,
+            paid=False
+        )
+
+        url = detail_url(ticket.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Ticket.objects.filter(id=ticket.id).exists())
+
+    def test_ticket_other_users_ticket_error(self):
+        '''Test deleting other users ticket returns error.'''
+        other_user = create_user(email='other@examp.com', password='testpass')
+        ticket = create_ticket(
+            user=other_user,
+            event=create_event(user=self.user),
+            price=5.00,
+            paid=False
+        )
+
+        url = detail_url(ticket.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(Ticket.objects.filter(id=ticket.id).exists())
