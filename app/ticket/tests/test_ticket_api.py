@@ -219,7 +219,7 @@ class PrivateTicketAPITests(TestCase):
             user=other_user,
             event=create_event(user=self.user),
             price=5.00,
-            paid=False
+            paid=True
         )
 
         url = detail_url(ticket.id)
