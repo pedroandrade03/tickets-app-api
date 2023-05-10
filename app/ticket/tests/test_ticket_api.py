@@ -179,4 +179,3 @@ class PrivateTicketAPITests(TestCase):
             else:
                 self.assertEqual(value, getattr(ticket, key))
         self.assertEqual(ticket.owner, self.user)
-        
