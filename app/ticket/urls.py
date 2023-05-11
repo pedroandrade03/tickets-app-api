@@ -11,6 +11,7 @@ from ticket import views
 
 router = DefaultRouter()
 router.register('ticket', views.TicketViewSet)
+router.register('event', views.EventViewSet)
 
 app_name = 'ticket'
 

@@ -1,11 +1,14 @@
 '''
 Views for the ticket APIs.
 '''
-from rest_framework import viewsets
+from rest_framework import (
+    viewsets,
+    mixins
+    )
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from core.models import Ticket
+from core.models import Ticket, Event
 from ticket import serializers
 
 
@@ -31,3 +34,11 @@ class TicketViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         '''Create a new ticket.'''
         serializer.save(owner=self.request.user)
+
+
+class EventViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    '''Manage events in the database.'''
+    serializer_class = serializers.EventSerializer
+    queryset = Event.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
